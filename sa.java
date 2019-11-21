@@ -5,7 +5,7 @@ import  java.util.Random;
 
 public class sa extends JFrame {
   static int adj[][]; // adjacency matric
-  static int v=0; // number of nodes
+  static int v=17;//0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
   static double min_dis=0;
@@ -84,7 +84,7 @@ public class sa extends JFrame {
     int current_Population [][]= new int [v][P];
     int Pr = 0;
     for (int i =0; i<G; i++) {
-      //Selection Process goes here
+      //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         if (Cr>=Pr) {
@@ -104,41 +104,19 @@ public class sa extends JFrame {
 
   public double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
-
-
-
-
-
+    double chunk = (2*Math.PI)/v;
+    double x1, y1, x2, y2;
+    for (int i=0;i<v;i++) {
+      x1 = Math.cos(i*chunk);
+      y1 = Math.sin(i*chunk);
+      for (int j=0;j<v;j++) {
+        x2 = Math.cos(j*chunk);
+        y2 = Math.sin(j*chunk);
+        if (adj[i][j]==1) {
+          totalEdgeLength=+Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+        }
+      }
+    }
     return totalEdgeLength;
-  }
-
-  public int[] Mutation(int[] ordering) {
-    int[] result = ordering;
-
-
-
-
-
-    return result;
-  }
-
-  public int[][] Crossover(int[] ordering1, int[] ordering2) {
-    int[][] result = null;
-
-
-
-
-
-    return result;
-  }
-
-  public int[] Reproduction(int[] ordering) {
-    int[] result = ordering;
-
-
-
-
-
-    return result;
   }
 }
