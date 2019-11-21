@@ -1,11 +1,16 @@
 import javax.swing.*;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.awt.Graphics;
-import  java.util.Random;
+import java.util.Collections;
+import java.util.Random;
+
+import java.awt.List;
 
 public class sa extends JFrame {
   static int adj[][]; // adjacency matric
-  static int v=17;//0; // number of nodes
+  static int v=18;//0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
   static double min_dis=0;
@@ -79,10 +84,24 @@ public class sa extends JFrame {
         }
       } catch (NumberFormatException e) {}
     }
-
-    int next_Population [][] = new int [v][P];
-    int current_Population [][]= new int [v][P];
+    current_ordering = new int[v];
+    int next_Population [][] = new int [P][v];
+    int current_Population [][]= new int [P][v];
     int Pr = 0;
+    for (int i = 0; i < v; i++) {
+      current_ordering[i]=i;
+    }
+    ArrayList<Integer> list = new ArrayList<Integer>();
+    for(int i=0; i<current_ordering.length; i++) {
+      list.add(current_ordering[i]);
+    }
+    for (int i=0; i<P; i++) {
+		  Collections.shuffle(list);
+      for (int n = 0; n < v; n++) {
+        current_ordering[n] = list.get(n);
+      }
+      current_Population[i]=current_ordering;
+    }
     for (int i =0; i<G; i++) {
       //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
