@@ -84,7 +84,7 @@ public class sa extends JFrame {
     int current_Population [][]= new int [v][P];
     int Pr = 0;
     for (int i =0; i<G; i++) {
-      //Selection Process goes here
+      //Selection Process goes here AKA sort by fitness
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         if (Cr>=Pr) {
@@ -110,35 +110,5 @@ public class sa extends JFrame {
 
 
     return totalEdgeLength;
-  }
-
-  public int[] Mutation(int[] ordering) {
-    int[] result = ordering;
-
-
-
-
-
-    return result;
-  }
-
-  public int[][] Crossover(int[] ordering1, int[] ordering2) {
-    int[][] result = null;
-
-
-
-
-
-    return result;
-  }
-
-  public int[] Reproduction(int[] ordering) {
-    int[] result = ordering;
-
-
-
-
-
-    return result;
   }
 }
