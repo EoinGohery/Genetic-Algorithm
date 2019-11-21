@@ -115,7 +115,16 @@ public class sa extends JFrame {
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
         } else if ((Cr+Mu)<=Pr) {
-          //Reproduction
+              //Reproduction
+        	
+        	int []reproduction;
+        	int rand = 0;
+        	int randIndex = (int)(Math.random() *list.size());
+        	rand = list.get(randIndex);
+        	
+        	reproduction = Arrays.copyOf(current_Population[rand],current_Population[rand].length);
+        	list.remove(randIndex);
+        	
         } else {
           i--;
         }
