@@ -117,12 +117,13 @@ public class sa extends JFrame {
         } else if ((Cr+Mu)<=Pr) {
               //Reproduction
         	
-        	int []reproduction;
+        	int []reproductionArr;
         	int rand = 0;
         	int randIndex = (int)(Math.random() *list.size());
         	rand = list.get(randIndex);
         	
-        	reproduction = Arrays.copyOf(current_Population[rand],current_Population[rand].length);
+        	reproductionArr = Arrays.copyOf(current_Population[rand],current_Population[rand].length);
+        	makeNextPopulation(reproductionArr,next_Population);
         	list.remove(randIndex);
         	
         } else {
@@ -222,5 +223,11 @@ public class sa extends JFrame {
       }
       System.out.println("");
     }
+  }
+
+  public static void makeNextPopulation(int[] next,int [][] next_Population) {
+	  for (int i=0; i< next_Population.length; i++) {
+		  next_Population[i] = Arrays.copyOf(next, next.length);
+	  }
   }
 }
