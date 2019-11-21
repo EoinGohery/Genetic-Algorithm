@@ -1,17 +1,13 @@
 import javax.swing.*;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.awt.Graphics;
-import java.util.Collections;
-import java.util.Random;
 import java.io.*;
 
 import java.awt.List;
 
 public class sa extends JFrame {
   static int adj[][]; // adjacency matric
-  static int v=18;//0; // number of nodes
+  static int v=0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
   static double min_dis=0;
@@ -52,15 +48,13 @@ public class sa extends JFrame {
     JTextField mutationField = new JTextField(3);
 
     //function to convert edge list to adjacency matrix && set v to number of nodes
-    try{
-	adj = convertEdgeListToMatrix(fillEdgeListFromFile())
-	printMatrix(adj);
-	v = adj[0].length;
-    }
-    catch(IOException exception) {
+    try {
+	    adj = convertEdgeListToMatrix(fillEdgeListFromFile());
+	    printMatrix(adj);
+	    v = adj[0].length;
+    } catch(IOException exception) {
       System.out.println(exception);
     }
-	  
 
     JPanel myPanel = new JPanel();
     myPanel.add(new JLabel("Population:"));
@@ -92,6 +86,7 @@ public class sa extends JFrame {
         }
       } catch (NumberFormatException e) {}
     }
+
     current_ordering = new int[v];
     int next_Population [][] = new int [P][v];
     int current_Population [][]= new int [P][v];
@@ -110,6 +105,7 @@ public class sa extends JFrame {
       }
       current_Population[i]=current_ordering;
     }
+
     for (int i =0; i<G; i++) {
       //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
@@ -146,7 +142,7 @@ public class sa extends JFrame {
     }
     return totalEdgeLength;
   }
-	
+
   private static ArrayList<ArrayList<Integer>> fillEdgeListFromFile() throws IOException {
     File reader = new File("input.txt");      // <- insert correct path here instead of default input text
     ArrayList<ArrayList<Integer>> edgeList = new ArrayList<ArrayList<Integer>>();
@@ -183,7 +179,7 @@ public class sa extends JFrame {
         largestCurrentValue = edgeList.get(1).get(i);
       }
     }
-
+    
     return largestCurrentValue;
   }
 
