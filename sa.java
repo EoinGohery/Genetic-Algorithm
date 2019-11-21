@@ -5,7 +5,7 @@ import  java.util.Random;
 
 public class sa extends JFrame {
   static int adj[][]; // adjacency matric
-  static int v=0; // number of nodes
+  static int v=17;//0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
   static double min_dis=0;
@@ -104,11 +104,19 @@ public class sa extends JFrame {
 
   public double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
-
-
-
-
-
+    double chunk = (2*Math.PI)/v;
+    double x1, y1, x2, y2;
+    for (int i=0;i<v;i++) {
+      x1 = Math.cos(i*chunk);
+      y1 = Math.sin(i*chunk);
+      for (int j=0;j<v;j++) {
+        x2 = Math.cos(j*chunk);
+        y2 = Math.sin(j*chunk);
+        if (adj[i][j]==1) {
+          totalEdgeLength=+Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+        }
+      }
+    }
     return totalEdgeLength;
   }
 }
