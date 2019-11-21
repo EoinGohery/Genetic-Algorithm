@@ -107,20 +107,46 @@ public class sa extends JFrame {
     }
 
     for (int i =0; i<G; i++) {
+    	
+    	
+    	
+    	
+    	
+    	
       //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
+        int randIndex = (int)(Math.random() *list.size());
         if (Cr>=Pr) {
           //Crossover
+        	
+        	
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
-          //Mutation
+          //Mutation	
+        	
+        	
+        	int mutator[] = new int[current_Population[0].length];
+           	int current = list.get(randIndex);
+        
+           	mutator = Arrays.copyOf(current_Population[current], mutator.length);
+        	list.remove(randIndex);
+        	
+        	int mutationA = 0, mutationB = 0;
+        	while(mutationA == mutationB) {
+        		int newRand = (int)(Math.random() * mutator.length-1);
+        		mutationA = newRand;
+        		mutationB = newRand;
+        	}
+        	
+        	swap(mutationA,mutationB,mutator);        	
+        	makeNextPopulation(mutator, next_Population);
+        	
+        	
         } else if ((Cr+Mu)<=Pr) {
-              //Reproduction
+          //Reproduction
         	
         	int []reproductionArr;
-        	int rand = 0;
-        	int randIndex = (int)(Math.random() *list.size());
-        	rand = list.get(randIndex);
+        	int rand = list.get(randIndex);
         	
         	reproductionArr = Arrays.copyOf(current_Population[rand],current_Population[rand].length);
         	makeNextPopulation(reproductionArr,next_Population);
@@ -135,7 +161,7 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-  public double getFitnessCost(int[] ordering) {
+public double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
     double chunk = (2*Math.PI)/v;
     double x1, y1, x2, y2;
@@ -224,10 +250,16 @@ public class sa extends JFrame {
       System.out.println("");
     }
   }
-
+  
   public static void makeNextPopulation(int[] next,int [][] next_Population) {
 	  for (int i=0; i< next_Population.length; i++) {
 		  next_Population[i] = Arrays.copyOf(next, next.length);
 	  }
   }
+	
+  private static void swap(int mutationA, int mutationB, int[]mutator) {
+	  int swap = mutator[mutationA];
+  	mutator[mutationA] = mutator[mutationB];
+  	mutator[mutationB] = swap;
+}  
 }
