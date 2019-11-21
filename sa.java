@@ -84,7 +84,7 @@ public class sa extends JFrame {
     int current_Population [][]= new int [v][P];
     int Pr = 0;
     for (int i =0; i<G; i++) {
-      //Selection Process goes here AKA sort by fitness
+      //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         if (Cr>=Pr) {
