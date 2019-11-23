@@ -109,13 +109,7 @@ public class sa extends JFrame {
     }
     int crossover_ordering [] = new int[v];
     for (int i =0; i<G; i++) {
-
-
-
-
-
-
-      //Selection Process goes here AKA sort by fitness (lowest first)
+      current_Population=sortPopulation(current_Population);
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         current_ordering=current_Population[i];
@@ -125,10 +119,17 @@ public class sa extends JFrame {
 
 
 
+
+
           i++;
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
-
+          int firstIndex = r.nextInt(v);
+          int secondIndex = r.nextInt(v);
+          int temp = current_ordering[firstIndex];
+          current_ordering[firstIndex] = current_ordering[secondIndex];
+          current_ordering[secondIndex] = temp;
+          next_Population[i]=current_ordering;
         } else if ((Cr+Mu)<=Pr) {
           //Reproduction
           next_Population[i]=current_ordering;
@@ -136,6 +137,7 @@ public class sa extends JFrame {
       }
       current_Population=next_Population;
     }
+    current_ordering=current_Population[0];
     sa visualization = new sa();
   }
 
@@ -229,9 +231,12 @@ public double getFitnessCost(int[] ordering) {
     }
   }
 
-  private static void swap(int mutationA, int mutationB, int[]mutator) {
-	  int swap = mutator[mutationA];
-  	mutator[mutationA] = mutator[mutationB];
-  	mutator[mutationB] = swap;
+  //Selection Process goes here AKA sort by fitness (lowest first)
+  private static int[][] sortPopulation(int[][] current_Population) {
+
+
+
+
+    return current_Population;
   }
 }
