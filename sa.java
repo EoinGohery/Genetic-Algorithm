@@ -1,16 +1,13 @@
 import javax.swing.*;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.awt.Graphics;
-import java.util.Collections;
-import java.util.Random;
+import java.io.*;
 
 import java.awt.List;
 
 public class sa extends JFrame {
   static int adj[][]; // adjacency matric
-  static int v=18;//0; // number of nodes
+  static int v=0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
   static double min_dis=0;
@@ -43,6 +40,7 @@ public class sa extends JFrame {
   }
 
   public static void main(String[] args) throws FileNotFoundException {
+    JFrame frame = new JFrame();
     Random r = new Random();
     int P=0; int G=0; int Cr=0; int Mu =0;
     JTextField populationField = new JTextField(3);
@@ -50,9 +48,14 @@ public class sa extends JFrame {
     JTextField crossoverField = new JTextField(3);
     JTextField mutationField = new JTextField(3);
 
-    //function to convert edge list to adjacency matrix
-    //set v to number of nodes
-    //here
+    //function to convert edge list to adjacency matrix && set v to number of nodes
+    try {
+	    adj = convertEdgeListToMatrix(fillEdgeListFromFile());
+	    printMatrix(adj);
+	    v = adj[0].length;
+    } catch(IOException exception) {
+      System.out.println(exception);
+    }
 
     JPanel myPanel = new JPanel();
     myPanel.add(new JLabel("Population:"));
@@ -69,7 +72,7 @@ public class sa extends JFrame {
 
     boolean valid = false;
     while(!valid) {
-      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
+      int result = JOptionPane.showConfirmDialog(frame, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
       try {
         if (result == JOptionPane.OK_OPTION) {
           P = Integer.parseInt(populationField.getText());
@@ -84,6 +87,7 @@ public class sa extends JFrame {
         }
       } catch (NumberFormatException e) {}
     }
+
     current_ordering = new int[v];
     int next_Population [][] = new int [P][v];
     int current_Population [][]= new int [P][v];
@@ -91,6 +95,7 @@ public class sa extends JFrame {
     for (int i = 0; i < v; i++) {
       current_ordering[i]=i;
     }
+    //list created to shuffle for the intitail random orderings
     ArrayList<Integer> list = new ArrayList<Integer>();
     for(int i=0; i<current_ordering.length; i++) {
       list.add(current_ordering[i]);
@@ -102,26 +107,39 @@ public class sa extends JFrame {
       }
       current_Population[i]=current_ordering;
     }
+    int crossover_ordering [] = new int[v];
     for (int i =0; i<G; i++) {
+
+
+
+
+
+
       //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
+        current_ordering=current_Population[i];
         if (Cr>=Pr) {
           //Crossover
+          crossover_ordering = current_Population[i+1];
+
+
+
+          i++;
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
+
         } else if ((Cr+Mu)<=Pr) {
           //Reproduction
-        } else {
-          i--;
+          next_Population[i]=current_ordering;
         }
       }
+      current_Population=next_Population;
     }
-
     sa visualization = new sa();
   }
 
-  public double getFitnessCost(int[] ordering) {
+public double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
     double chunk = (2*Math.PI)/v;
     double x1, y1, x2, y2;
@@ -137,5 +155,83 @@ public class sa extends JFrame {
       }
     }
     return totalEdgeLength;
+  }
+
+  private static ArrayList<ArrayList<Integer>> fillEdgeListFromFile() throws IOException {
+    File reader = new File("input.txt");      // <- insert correct path here instead of default input text
+    ArrayList<ArrayList<Integer>> edgeList = new ArrayList<ArrayList<Integer>>();
+
+    if(!reader.exists()) {
+      System.out.println("Input file not found");
+    }
+    else {
+      Scanner in = new Scanner(reader);
+      String[] aLineFromFile;
+
+      // Initalise edgeList:
+      edgeList.add(new ArrayList<Integer>());
+      edgeList.add(new ArrayList<Integer>());
+
+      // Fill edgeList with data from file
+      while(in.hasNext()) {
+        aLineFromFile = in.nextLine().split(" ");
+        edgeList.get(0).add(Integer.parseInt(aLineFromFile[0]));
+        edgeList.get(1).add(Integer.parseInt(aLineFromFile[1]));
+      }
+    }
+    return edgeList;
+  }
+
+  private static int findLargestEdgeListElement(ArrayList<ArrayList<Integer>> edgeList) {
+    int largestCurrentValue = 0;
+
+    for(int i=0;i<edgeList.get(0).size();i++) {
+      if(largestCurrentValue < edgeList.get(0).get(i)) {
+        largestCurrentValue = edgeList.get(0).get(i);
+      }
+      if(largestCurrentValue < edgeList.get(1).get(i)) {
+        largestCurrentValue = edgeList.get(1).get(i);
+      }
+    }
+
+    return largestCurrentValue;
+  }
+
+  private static int[][] convertEdgeListToMatrix(ArrayList<ArrayList<Integer>> edgeList) {
+    int[][] matrix;
+    // edgeList values are index numbers therefore +1 for dimentions
+    int dimentions = findLargestEdgeListElement(edgeList) + 1;
+
+    matrix = new int[dimentions][dimentions];
+
+    // Initalize matrix
+    for(int i=0;i<dimentions;i++) {
+      for(int j=0;j<dimentions;j++) {
+        matrix[i][j] = 0;
+      }
+    }
+
+    // Fill matrix
+    for(int i=0;i<edgeList.get(0).size();i++) {
+      matrix[edgeList.get(0).get(i)][edgeList.get(1).get(i)] = 1;
+      matrix[edgeList.get(1).get(i)][edgeList.get(0).get(i)] = 1;
+    }
+
+    return matrix;
+  }
+
+  private static void printMatrix(int[][] matrix) {
+    for(int i=0;i<matrix[0].length;i++) {
+      for(int j=0;j<matrix[0].length;j++) {
+          System.out.print(matrix[i][j] + " ");
+      }
+      System.out.println("");
+    }
+  }
+
+  private static void swap(int mutationA, int mutationB, int[]mutator) {
+	  int swap = mutator[mutationA];
+  	mutator[mutationA] = mutator[mutationB];
+  	mutator[mutationB] = swap;
   }
 }
