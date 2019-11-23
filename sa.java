@@ -40,6 +40,7 @@ public class sa extends JFrame {
   }
 
   public static void main(String[] args) throws FileNotFoundException {
+    JFrame frame = new JFrame();
     Random r = new Random();
     int P=0; int G=0; int Cr=0; int Mu =0;
     JTextField populationField = new JTextField(3);
@@ -71,7 +72,7 @@ public class sa extends JFrame {
 
     boolean valid = false;
     while(!valid) {
-      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
+      int result = JOptionPane.showConfirmDialog(frame, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
       try {
         if (result == JOptionPane.OK_OPTION) {
           P = Integer.parseInt(populationField.getText());
@@ -107,53 +108,46 @@ public class sa extends JFrame {
     }
 
     for (int i =0; i<G; i++) {
-    	
-    	
-    	
-    	
-    	
-    	
+
+
+
+
+
+
       //Selection Process goes here AKA sort by fitness (lowest first)
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         int randIndex = (int)(Math.random() *list.size());
         if (Cr>=Pr) {
           //Crossover
-        	
-        	
+
+
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
-          //Mutation	
-        	
-        	
+          //Mutation
         	int mutator[] = new int[current_Population[0].length];
            	int current = list.get(randIndex);
-        
-           	mutator = Arrays.copyOf(current_Population[current], mutator.length);
+
+          mutator = Arrays.copyOf(current_Population[current], mutator.length);
         	list.remove(randIndex);
-        	
+
         	int mutationA = 0, mutationB = 0;
         	while(mutationA == mutationB) {
         		int newRand = (int)(Math.random() * mutator.length-1);
         		mutationA = newRand;
         		mutationB = newRand;
         	}
-        	
-        	swap(mutationA,mutationB,mutator);        	
+
+        	swap(mutationA,mutationB,mutator);
         	makeNextPopulation(mutator, next_Population);
-        	
-        	
+
         } else if ((Cr+Mu)<=Pr) {
           //Reproduction
-        	
         	int []reproductionArr;
         	int rand = list.get(randIndex);
-        	
+
         	reproductionArr = Arrays.copyOf(current_Population[rand],current_Population[rand].length);
         	makeNextPopulation(reproductionArr,next_Population);
         	list.remove(randIndex);
-        	
-        } else {
-          i--;
         }
       }
     }
@@ -215,7 +209,7 @@ public double getFitnessCost(int[] ordering) {
         largestCurrentValue = edgeList.get(1).get(i);
       }
     }
-    
+
     return largestCurrentValue;
   }
 
@@ -250,16 +244,16 @@ public double getFitnessCost(int[] ordering) {
       System.out.println("");
     }
   }
-  
+
   public static void makeNextPopulation(int[] next,int [][] next_Population) {
 	  for (int i=0; i< next_Population.length; i++) {
 		  next_Population[i] = Arrays.copyOf(next, next.length);
 	  }
   }
-	
+
   private static void swap(int mutationA, int mutationB, int[]mutator) {
 	  int swap = mutator[mutationA];
   	mutator[mutationA] = mutator[mutationB];
   	mutator[mutationB] = swap;
-}  
+  }
 }
