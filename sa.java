@@ -55,6 +55,7 @@ public class sa extends JFrame {
 	    v = adj[0].length;
     } catch(IOException exception) {
       System.out.println(exception);
+	    //TODO: create procedure for when the file is not present (create default data?)
     }
 
     JPanel myPanel = new JPanel();
@@ -233,7 +234,7 @@ public double getFitnessCost(int[] ordering) {
 
   //Selection Process goes here AKA sort by fitness (lowest first)
   private static int[][] sortPopulation(int[][] current_Population) {
-
+	int[][] orderedPopulation; 
 
 
 
