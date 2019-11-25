@@ -19,7 +19,6 @@ public class sa extends JFrame {
     setVisible(true);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
-
   public void paint(Graphics g) {
     int radius =100;
     int mov =200;
@@ -30,16 +29,16 @@ public class sa extends JFrame {
       for (int j=i+1; j<v; j++) {
         if(adj[current_ordering[i]][current_ordering[j]]==1) {
           g.drawLine((int)(((double) Math.cos(i*chunk))*radius + mov),
-                     (int)(((double) Math.cos(i*chunk))*radius + mov),
-                     (int)(((double) Math.cos(i*chunk))*radius + mov),
-                     (int)(((double) Math.cos(i*chunk))*radius + mov));
+                     (int)(((double) Math.sin(i*chunk))*radius + mov),
+                     (int)(((double) Math.cos(j*chunk))*radius + mov),
+                     (int)(((double) Math.sin(j*chunk))*radius + mov));
         }
       }
     }
   }
 
   public static void main(String[] args) throws FileNotFoundException {
-    JFrame frame = new JFrame();
+    //JFrame frame = new JFrame();
     Random r = new Random();
     int P=0; int G=0; int Cr=0; int Mu =0;
     JTextField populationField = new JTextField(3);
@@ -52,6 +51,7 @@ public class sa extends JFrame {
 	    adj = convertEdgeListToMatrix(fillEdgeListFromFile());
 	    printMatrix(adj);
 	    v = adj[0].length;
+      chunk = (2*Math.PI)/v;
     } catch(IOException exception) {
       System.out.println(exception);
 	    //TODO: create procedure for when the file is not present (create default data?)
@@ -72,7 +72,7 @@ public class sa extends JFrame {
 
     boolean valid = false;
     while(!valid) {
-      int result = JOptionPane.showConfirmDialog(frame, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
+      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
       try {
         if (result == JOptionPane.OK_OPTION) {
           P = Integer.parseInt(populationField.getText());
@@ -145,7 +145,6 @@ public class sa extends JFrame {
 
 public static double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
-    double chunk = (2*Math.PI)/v;
     double x1, y1, x2, y2;
     for (int i=0;i<v;i++) {
       x1 = Math.cos(i*chunk);
