@@ -142,7 +142,7 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-public double getFitnessCost(int[] ordering) {
+public static double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
     double chunk = (2*Math.PI)/v;
     double x1, y1, x2, y2;
@@ -234,9 +234,15 @@ public double getFitnessCost(int[] ordering) {
 
   //Selection Process goes here AKA sort by fitness (lowest first)
   private static int[][] sortPopulation(int[][] current_Population) {
-	int[][] orderedPopulation; 
+	int[][] orderedPopulation;
+  double[] current_Population_Fitness_Values = new double[current_Population[0].length];
 
+  // Fill a parallel array with fitness values
+  for(int i=0;i<current_Population[0].length;i++) {
+    current_Population_Fitness_Values[i] = getFitnessCost(current_Population[i]);
+  }
 
+  //TODO sort current population based on the fitness values.
 
     return current_Population;
   }
