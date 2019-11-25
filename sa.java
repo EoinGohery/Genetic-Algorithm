@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.Graphics;
 import java.io.*;
-
 import java.awt.List;
 
 public class sa extends JFrame {
@@ -110,13 +109,13 @@ public class sa extends JFrame {
     }
     int crossover_ordering [] = new int[v];
     for (int i =0; i<G; i++) {
-      current_Population=sortPopulation(current_Population);
+      current_Population=selectionProcess(current_Population, P);
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
-        current_ordering=current_Population[i];
-        if (Cr>=Pr) {
+        current_ordering=current_Population[j];
+        if (Cr>=Pr && P!=(j+1)) {
           //Crossover
-          crossover_ordering = current_Population[i+1];
+          crossover_ordering = current_Population[j+1];
 
 
 
@@ -130,10 +129,12 @@ public class sa extends JFrame {
           int temp = current_ordering[firstIndex];
           current_ordering[firstIndex] = current_ordering[secondIndex];
           current_ordering[secondIndex] = temp;
-          next_Population[i]=current_ordering;
+          next_Population[j]=current_ordering;
         } else if ((Cr+Mu)<=Pr) {
           //Reproduction
-          next_Population[i]=current_ordering;
+          next_Population[j]=current_ordering;
+        } else {
+          i--;
         }
       }
       current_Population=next_Population;
@@ -232,18 +233,23 @@ public static double getFitnessCost(int[] ordering) {
     }
   }
 
-  //Selection Process goes here AKA sort by fitness (lowest first)
-  private static int[][] sortPopulation(int[][] current_Population) {
-	int[][] orderedPopulation;
-  double[] current_Population_Fitness_Values = new double[current_Population[0].length];
-
-  // Fill a parallel array with fitness values
-  for(int i=0;i<current_Population[0].length;i++) {
-    current_Population_Fitness_Values[i] = getFitnessCost(current_Population[i]);
-  }
-
-  //TODO sort current population based on the fitness values.
-
-    return current_Population;
+  //Selection Process AKA sort by fitness (lowest first)
+  private static int[][] selectionProcess(int[][] current_Population, int P) {
+    double[] orderingValues = new double[P];
+    	for (int i=0; i<P; i++) {
+    		orderingValues[i]=getFitnessCost(current_Population[i]);
+    	}
+    	int[][] sortedPopulation = current_Population.clone();
+      double[] sortedValues = orderingValues.clone();
+    	Arrays.sort(sortedValues);
+    		for (int i=0; i<P; i++)
+    		{
+    			for (int j=0; j<P; j++) {
+    				if (orderingValues[j]==sortedValues[i]) {
+    					sortedPopulation[i]=current_Population[j];
+    				}
+    			}
+    		}
+		return sortedPopulation;
   }
 }
