@@ -73,6 +73,7 @@ public class sa extends JFrame {
     myPanel.add(mutationField);
 
     boolean valid = false;
+    // Get user input
     while(!valid) {
       int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
       try {
@@ -87,7 +88,10 @@ public class sa extends JFrame {
         if (P>0 && G>0 && Cr>=0 && Cr<=100 && Mu>=0 && Mu<=100 && Mu+Cr<=100) {
           valid = true;
         }
-      } catch (NumberFormatException e) {}
+      } catch (NumberFormatException e) {
+        //TODO: make a better error output.
+        System.out.println(e);
+      }
     }
 
     current_ordering = new int[v];
@@ -112,7 +116,8 @@ public class sa extends JFrame {
     }
 
 
-    // int crossover_ordering [] = new int[v];
+    // Start Genetic Algorithm:
+
     for (int i =0; i<G; i++) {
       current_Population=selectionProcess(current_Population, P);
       for (int j =0; j<P; j++) {
@@ -120,7 +125,7 @@ public class sa extends JFrame {
         current_ordering=current_Population[j];
         if (Cr>=Pr && P!=(j+1)) {
           //Crossover
-          // crossover_ordering = current_Population[j+1];
+          // crossoverProcess(current_Population); // pass by reference atm, should we change it to return the array[][] instead?
 
 
 
@@ -148,15 +153,32 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-  private static void crossoverFunction(int[][] population) {
-    //TODO: select orderings to crossover and pass them to tool
-    //TODO: select crossover point and pass to tool;
-    // if first position (most healthy) is used as crossover, do we keep a copy of first position and throw out last position?
+  private static void crossoverProcess(int[][] population) {
+
+    // Q: if first position (most healthy) is used as crossover, do we keep a copy of first position and throw out last position?
+
+    int first_Ordering_Index, second_Ordering_Index, cuttingPoint;
+    Random randomGenerator = new Random();
+
+    first_Ordering_Index = randomGenerator.nextInt(population.length - 1); //index range
+    second_Ordering_Index = randomGenerator.nextInt(population.length - 1);
+
+    cuttingPoint = randomGenerator.nextInt(population[0].length - 3);
+    cuttingPoint++; // between 1 and |N| - 2
+
+    if(first_Ordering_Index == second_Ordering_Index) {
+      //TODO: Decide on action.
+      // only one population has been selected, the options are: do nothing or change one index value
+      // would not break code to pass it into crossOverFunction, would also not do anything of value.
+    }
+    else {
+      // Send chosen orderings and cuttingPoint to crossOverFunction()
+      crossOverFunction(population[first_Ordering_Index], population[second_Ordering_Index], cuttingPoint);
+    }
 
   }
 
-  private static void toolForCrossoverFunction(int[] first_Ordering, int[] second_Ordering, int crossoverPoint) {
-    // need random value for crossover? or pass one in?
+  private static void crossOverFunction(int[] first_Ordering, int[] second_Ordering, int cuttingPoint) {
     ArrayList<Integer> first_Ordering_Duplicates = new ArrayList<Integer>();
     ArrayList<Integer> second_Ordering_Duplicates = new ArrayList<Integer>();
     int orderingLengths = first_Ordering.length;
@@ -164,7 +186,7 @@ public class sa extends JFrame {
     boolean duplicates = false;
 
     // apply crossover
-    for(int i=crossoverPoint;i<orderingLengths;i++) {
+    for(int i=cuttingPoint;i<orderingLengths;i++) {
       temp = first_Ordering[i];
       first_Ordering[i] = second_Ordering[i];
       second_Ordering[i] = temp;
@@ -185,10 +207,9 @@ public class sa extends JFrame {
     }
 
     if(duplicates) {
-      //TODO:
-      // if only one element is duplicate
+      // The sizes of these two should always be the same
+      // If they are different then the input data is incorrect
       if(first_Ordering_Duplicates.size() != second_Ordering_Duplicates.size()) {
-        // This should never happen,
         System.out.println("Error in toolForCrossoverFunction(), duplicate quantities do not match");
       }
       // find position of each duplicate and replace it with a missing value
