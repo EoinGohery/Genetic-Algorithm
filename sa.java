@@ -9,7 +9,6 @@ public class sa extends JFrame {
   static int v=0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
-  static double min_dis=0;
   static double chunk;
 
   public sa()
