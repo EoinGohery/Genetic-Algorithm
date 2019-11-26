@@ -148,19 +148,47 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-  private static void crossoverFunction(int[] first_Ordering, int[] second_Ordering, int crossoverPoint) {
+  private static void crossoverFunction(int[][] population) {
+    //TODO: select orderings to crossover and pass them to tool
+    //TODO: select crossover point and pass to tool;
+  }
+
+  private static void toolForCrossoverFunction(int[] first_Ordering, int[] second_Ordering, int crossoverPoint) {
     // need random value for crossover? or pass one in?
+    ArrayList<Integer> first_Ordering_Duplicates = new ArrayList<Integer>();
+    ArrayList<Integer> second_Ordering_Duplicates = new ArrayList<Integer>();
     int orderingLengths = first_Ordering.length;
     int temp;
+    boolean duplicates = false;
 
-
+    // apply crossover
     for(int i=crossoverPoint;i<orderingLengths;i++) {
       temp = first_Ordering[i];
       first_Ordering[i] = second_Ordering[i];
       second_Ordering[i] = temp;
     }
 
-    // TODO: check for duplicate Values and replace with missing value
+    // check for duplicate Values
+    for (int i=0;i<orderingLengths;i++) {
+      for (int j=0;j<orderingLengths;j++) {
+        if(first_Ordering[i] == first_Ordering[j] && i != j) {
+          duplicates = true;
+          first_Ordering_Duplicates.add(first_Ordering[i]);
+        }
+        if(second_Ordering[i] == second_Ordering[j] && i != j) {
+          duplicates = true;
+          second_Ordering_Duplicates.add(second_Ordering[i]);
+        }
+      }
+
+      if(duplicates) {
+        //TODO:
+      }
+
+    }
+
+
+
 
   }
 
