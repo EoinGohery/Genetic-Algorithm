@@ -178,7 +178,7 @@ public class sa extends JFrame {
             }
           }
           next_Population[j] = current_ordering;
-          next_Population[j + 1] = crossover_ordering[j+1];
+          next_Population[j + 1] = crossover_ordering;
           j++; // we have added two elements to next population.
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
