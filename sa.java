@@ -46,7 +46,9 @@ public class sa extends JFrame {
     JTextField crossoverField = new JTextField(3);
     JTextField mutationField = new JTextField(3);
 
-    //function to convert edge list to adjacency matrix && set v to number of nodes
+    // Read input data from file,
+    // convert edge list to adjacency matrix,
+    // set v to number of nodes
     try {
 	    adj = convertEdgeListToMatrix(fillEdgeListFromFile());
 	    printMatrix(adj);
@@ -95,19 +97,22 @@ public class sa extends JFrame {
     for (int i = 0; i < v; i++) {
       current_ordering[i]=i;
     }
-    //list created to shuffle for the intitail random orderings
-    ArrayList<Integer> list = new ArrayList<Integer>();
+
+    // fill the inital current_Population with randomized orderings
+    ArrayList<Integer> initalList = new ArrayList<Integer>();
     for(int i=0; i<current_ordering.length; i++) {
-      list.add(current_ordering[i]);
+      initalList.add(current_ordering[i]);
     }
     for (int i=0; i<P; i++) {
-		  Collections.shuffle(list);
+		  Collections.shuffle(initalList);
       for (int n = 0; n < v; n++) {
-        current_ordering[n] = list.get(n);
+        current_ordering[n] = initalList.get(n);
       }
       current_Population[i]=current_ordering;
     }
-    int crossover_ordering [] = new int[v];
+
+
+    // int crossover_ordering [] = new int[v];
     for (int i =0; i<G; i++) {
       current_Population=selectionProcess(current_Population, P);
       for (int j =0; j<P; j++) {
@@ -115,7 +120,7 @@ public class sa extends JFrame {
         current_ordering=current_Population[j];
         if (Cr>=Pr && P!=(j+1)) {
           //Crossover
-          crossover_ordering = current_Population[j+1];
+          // crossover_ordering = current_Population[j+1];
 
 
 
@@ -143,7 +148,23 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-public static double getFitnessCost(int[] ordering) {
+  private static void crossoverFunction(int[] first_Ordering, int[] second_Ordering, int crossoverPoint) {
+    // need random value for crossover? or pass one in?
+    int orderingLengths = first_Ordering.length;
+    int temp;
+
+
+    for(int i=crossoverPoint;i<orderingLengths;i++) {
+      temp = first_Ordering[i];
+      first_Ordering[i] = second_Ordering[i];
+      second_Ordering[i] = temp;
+    }
+
+    // TODO: check for duplicate Values and replace with missing value
+
+  }
+
+  public static double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
     double x1, y1, x2, y2;
     for (int i=0;i<v;i++) {
