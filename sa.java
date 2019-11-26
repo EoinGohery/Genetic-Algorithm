@@ -151,6 +151,8 @@ public class sa extends JFrame {
   private static void crossoverFunction(int[][] population) {
     //TODO: select orderings to crossover and pass them to tool
     //TODO: select crossover point and pass to tool;
+    // if first position (most healthy) is used as crossover, do we keep a copy of first position and throw out last position?
+
   }
 
   private static void toolForCrossoverFunction(int[] first_Ordering, int[] second_Ordering, int crossoverPoint) {
@@ -297,8 +299,18 @@ public class sa extends JFrame {
     }
   }
 
-  //Selection Process AKA sort by fitness (lowest first)
+
   private static int[][] selectionProcess(int[][] current_Population, int P) {
+    int[][] sorted_Population = sortByFitness(current_Population, P);
+
+    //TODO: remove the bottom third of the population and replace with the top third
+
+
+    return sorted_Population;
+  }
+
+  // sort by fitness (lowest first)
+  private static int[][] sortByFitness(int[][] current_Population, int P) {
     double[] orderingValues = new double[P];
     	for (int i=0; i<P; i++) {
     		orderingValues[i]=getFitnessCost(current_Population[i]);
