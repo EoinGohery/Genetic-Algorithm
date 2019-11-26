@@ -196,6 +196,7 @@ public class sa extends JFrame {
       }
       current_Population=next_Population;
     }
+    current_Population = selectionProcess(current_Population, P);
     current_ordering=current_Population[0];
     sa visualization = new sa();
   }
@@ -289,12 +290,13 @@ public class sa extends JFrame {
     }
   }
 
-
   private static int[][] selectionProcess(int[][] current_Population, int P) {
     int[][] sorted_Population = sortByFitness(current_Population, P);
 
-    //TODO: remove the bottom third of the population and replace with the top third
-
+    int third = P/3;
+    for (int i=0; i<third; i++ ) {
+      sorted_Population[P-1-i] = sorted_Population[third-i];
+    }
 
     return sorted_Population;
   }
