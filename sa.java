@@ -180,16 +180,32 @@ public class sa extends JFrame {
           second_Ordering_Duplicates.add(second_Ordering[i]);
         }
       }
-
-      if(duplicates) {
-        //TODO:
-      }
-
     }
 
-
-
-
+    if(duplicates) {
+      //TODO:
+      // if only one element is duplicate
+      if(first_Ordering_Duplicates.size() != second_Ordering_Duplicates.size()) {
+        // This should never happen,
+        System.out.println("Error in toolForCrossoverFunction(), duplicate quantities do not match");
+      }
+      // find position of each duplicate and replace it with a missing value
+      // (one that is now a duplicate in the other set)
+      for (int i=0;i<first_Ordering_Duplicates.size();i++ ) {
+        for (int j=0;j<orderingLengths;j++) {
+          if(first_Ordering_Duplicates.get(i) == first_Ordering[j]) {
+            first_Ordering[j] = second_Ordering_Duplicates.get(i);
+            break;
+          }
+        }
+        for (int j=0;j<orderingLengths;j++) {
+          if(second_Ordering_Duplicates.get(i) == second_Ordering[j]) {
+            second_Ordering[j] = first_Ordering_Duplicates.get(i);
+            break;
+          }
+        }
+      }
+    }
   }
 
   public static double getFitnessCost(int[] ordering) {
