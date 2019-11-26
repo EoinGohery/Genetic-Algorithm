@@ -115,22 +115,19 @@ public class sa extends JFrame {
       current_Population[i]=current_ordering;
     }
 
-
-    // Start Genetic Algorithm:
+    // Setup completed:
+    // Start Genetic Algorithm: ------------------------------------------------
 
     for (int i =0; i<G; i++) {
       current_Population=selectionProcess(current_Population, P);
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
         current_ordering=current_Population[j];
+
         if (Cr>=Pr && P!=(j+1)) {
           //Crossover
-          // crossoverProcess(current_Population); // pass by reference atm, should we change it to return the array[][] instead?
-
-
-
-
-
+          crossoverProcess(current_Population, next_Population, j);
+          j++; // we have added two elements to next population.
           i++;
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
@@ -153,17 +150,21 @@ public class sa extends JFrame {
     sa visualization = new sa();
   }
 
-  private static void crossoverProcess(int[][] population) {
-
+  // Performs crossover on two elements of current population,
+  // adds the resulting elements to next_Population using pass by reference,
+  // calls a method to remove the copies from current_Population
+  // returns a modified current_Population
+  // this function is doing too much (personal opinion).
+  private static int[][] crossoverProcess(int[][] current_Population, int[][] next_Population, int next_Population_Available_Index) {
     // Q: if first position (most healthy) is used as crossover, do we keep a copy of first position and throw out last position?
-
+    int[][] new_Current_Population = current_Population;
     int first_Ordering_Index, second_Ordering_Index, cuttingPoint;
     Random randomGenerator = new Random();
 
-    first_Ordering_Index = randomGenerator.nextInt(population.length - 1); //index range
-    second_Ordering_Index = randomGenerator.nextInt(population.length - 1);
+    first_Ordering_Index = randomGenerator.nextInt(current_Population.length - 1); //index range
+    second_Ordering_Index = randomGenerator.nextInt(current_Population.length - 1);
 
-    cuttingPoint = randomGenerator.nextInt(population[0].length - 3);
+    cuttingPoint = randomGenerator.nextInt(current_Population[0].length - 3);
     cuttingPoint++; // between 1 and |N| - 2
 
     if(first_Ordering_Index == second_Ordering_Index) {
@@ -173,9 +174,31 @@ public class sa extends JFrame {
     }
     else {
       // Send chosen orderings and cuttingPoint to crossOverFunction()
-      crossOverFunction(population[first_Ordering_Index], population[second_Ordering_Index], cuttingPoint);
+      crossOverFunction(current_Population[first_Ordering_Index], current_Population[second_Ordering_Index], cuttingPoint);
+
+      // add the orderings to next_Population
+      next_Population[next_Population_Available_Index] = current_Population[first_Ordering_Index];
+      next_Population[next_Population_Available_Index + 1] = current_Population[second_Ordering_Index];
+
+      // remove from current_Population
+      new_Current_Population = removeOrderings(current_Population, first_Ordering_Index, second_Ordering_Index);
     }
 
+    return new_Current_Population;
+  }
+
+  private static int[][] removeOrderings(int[][] population_Field, int first_Ordering_Index, int second_Ordering_Index) {
+    int[][] new_Pop_Field = new int[population_Field.length - 2][population_Field[0].length];
+    int temp = 0;
+
+    // fill new_Pop_Field with population_Field but skip the two extra elements
+    for (int i=0;i<population_Field.length;i++) {
+      if(temp != first_Ordering_Index && temp != second_Ordering_Index) {
+        new_Pop_Field[temp] = population_Field[i];
+        temp++;
+      }
+    }
+    return new_Pop_Field;
   }
 
   private static void crossOverFunction(int[] first_Ordering, int[] second_Ordering, int cuttingPoint) {
