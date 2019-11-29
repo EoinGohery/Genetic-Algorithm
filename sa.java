@@ -1,3 +1,12 @@
+/*  Project Group Members:
+*
+*   Eoin Gohery - 17206413
+*   Cian McInerney - 17232724
+*   Jonathan Ryley - 17244501
+*   Zeyuan Song - 19096216
+*
+*/
+
 import javax.swing.*;
 import java.util.*;
 import java.awt.Graphics;
@@ -9,8 +18,9 @@ public class sa extends JFrame {
   static int v=0; // number of nodes
   static int current_ordering [];
   static double current_fitness=0;
-  static double min_dis=0;
   static double chunk;
+  static int radius =100;
+  static int mov =200;
 
   public sa()
   {
@@ -20,18 +30,16 @@ public class sa extends JFrame {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
   public void paint(Graphics g) {
-    int radius =100;
-    int mov =200;
 
     double w = v;
 
     for (int i=0; i<v; i++) {
-      for (int j=i+1; j<v; j++) {
+      for (int j=0; j<v; j++) {
         if(adj[current_ordering[i]][current_ordering[j]]==1) {
           g.drawLine((int)(((double) Math.cos(i*chunk))*radius + mov),
-                     (int)(((double) Math.sin(i*chunk))*radius + mov),
-                     (int)(((double) Math.cos(j*chunk))*radius + mov),
-                     (int)(((double) Math.sin(j*chunk))*radius + mov));
+                  (int)(((double) Math.sin(i*chunk))*radius + mov),
+                  (int)(((double) Math.cos(j*chunk))*radius + mov),
+                  (int)(((double) Math.sin(j*chunk))*radius + mov));
         }
       }
     }
@@ -50,14 +58,15 @@ public class sa extends JFrame {
     // convert edge list to adjacency matrix,
     // set v to number of nodes
     try {
-	    adj = convertEdgeListToMatrix(fillEdgeListFromFile());
-	    printMatrix(adj);
-	    v = adj[0].length;
-      chunk = (2*Math.PI)/v;
+      adj = convertEdgeListToMatrix(fillEdgeListFromFile());
+      printMatrix(adj);
+      v = adj[0].length;
     } catch(IOException exception) {
       System.out.println(exception);
-	    //TODO: create procedure for when the file is not present (create default data?)
+      //TODO: create procedure for when the file is not present (create default data?)
     }
+
+    chunk = (2*Math.PI)/v;
 
     JPanel myPanel = new JPanel();
     myPanel.add(new JLabel("Population:"));
@@ -75,7 +84,7 @@ public class sa extends JFrame {
     boolean valid = false;
     // Get user input
     while(!valid) {
-      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Enter Numerical Values Only", JOptionPane.OK_CANCEL_OPTION);
+      int result = JOptionPane.showConfirmDialog(null, myPanel, "Please Fill in Fields", JOptionPane.OK_CANCEL_OPTION);
       try {
         if (result == JOptionPane.OK_OPTION) {
           P = Integer.parseInt(populationField.getText());
@@ -87,10 +96,12 @@ public class sa extends JFrame {
         }
         if (P>0 && G>0 && Cr>=0 && Cr<=100 && Mu>=0 && Mu<=100 && Mu+Cr<=100) {
           valid = true;
-        }
-      } catch (NumberFormatException e) {
-        //TODO: make a better error output.
-        System.out.println(e);
+        } else if (P<1 || G<1) {
+          JOptionPane.showMessageDialog(null,"Population and Generation must both be greater than 0","Error", 0);
+        } else if (Mu+Cr>100) {
+          JOptionPane.showMessageDialog(null, "The Sum of Crossover and Mutation must not exceed 100", "Error", 0);
+        }     } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null,"Please Enter Numerical Values Only","Error", 0);
       }
     }
 
@@ -108,123 +119,85 @@ public class sa extends JFrame {
       initalList.add(current_ordering[i]);
     }
     for (int i=0; i<P; i++) {
-		  Collections.shuffle(initalList);
+      Collections.shuffle(initalList);
       for (int n = 0; n < v; n++) {
         current_ordering[n] = initalList.get(n);
       }
-      current_Population[i]=current_ordering;
+      current_Population[i]=Arrays.copyOf(current_ordering, v);
     }
-
     // Setup completed:
     // Start Genetic Algorithm: ------------------------------------------------
 
     for (int i =0; i<G; i++) {
-      current_Population=selectionProcess(current_Population, P);
+      current_Population=Arrays.copyOf(selectionProcess(current_Population, P), P);
       for (int j =0; j<P; j++) {
         Pr = r.nextInt(101);
-        current_ordering=current_Population[j];
+        current_ordering=Arrays.copyOf(current_Population[j], v);
 
         if (Cr>=Pr && P!=(j+1)) {
           //Crossover
           crossoverProcess(current_Population, next_Population, j);
           j++; // we have added two elements to next population.
-          i++;
         } else if (Cr<=Pr && Pr<=(Cr+Mu)) {
           //Mutation
-          int firstIndex = r.nextInt(v);
-          int secondIndex = r.nextInt(v);
-          int temp = current_ordering[firstIndex];
-          current_ordering[firstIndex] = current_ordering[secondIndex];
-          current_ordering[secondIndex] = temp;
-          next_Population[j]=current_ordering;
+          Mutation();
+          next_Population[j]=Arrays.copyOf(current_ordering, v);
         } else if ((Cr+Mu)<=Pr) {
           //Reproduction
-          next_Population[j]=current_ordering;
+          next_Population[j]=Arrays.copyOf(current_ordering, v);
         } else {
           i--;
         }
       }
-      current_Population=next_Population;
+      current_Population=Arrays.copyOf(next_Population, P);
     }
-    current_ordering=current_Population[0];
+    current_Population = Arrays.copyOf(selectionProcess(current_Population, P), P);
+    current_ordering= Arrays.copyOf(current_Population[0], P);
     sa visualization = new sa();
   }
+  public static void Mutation() {
+    int temp=0;
+    Random r = new Random();
+    int firstIndex = r.nextInt(v);
+    int secondIndex = r.nextInt(v);
 
-  // Performs crossover on two elements of current population,
-  // adds the resulting elements to next_Population using pass by reference,
-  // calls a method to remove the copies from current_Population
-  // returns a modified current_Population
-  // this function is doing too much (personal opinion).
-  private static int[][] crossoverProcess(int[][] current_Population, int[][] next_Population, int next_Population_Available_Index) {
-    // Q: if first position (most healthy) is used as crossover, do we keep a copy of first position and throw out last position?
-    int[][] new_Current_Population = current_Population;
-    int first_Ordering_Index, second_Ordering_Index, cuttingPoint;
-    Random randomGenerator = new Random();
-
-    first_Ordering_Index = randomGenerator.nextInt(current_Population.length - 1); //index range
-    second_Ordering_Index = randomGenerator.nextInt(current_Population.length - 1);
-
-    cuttingPoint = randomGenerator.nextInt(current_Population[0].length - 3);
-    cuttingPoint++; // between 1 and |N| - 2
-
-    if(first_Ordering_Index == second_Ordering_Index) {
-      //TODO: Decide on action.
-      // only one population has been selected, the options are: do nothing or change one index value
-      // would not break code to pass it into crossOverFunction, would also not do anything of value.
-    }
-    else {
-      // Send chosen orderings and cuttingPoint to crossOverFunction()
-      crossOverFunction(current_Population[first_Ordering_Index], current_Population[second_Ordering_Index], cuttingPoint);
-
-      // add the orderings to next_Population
-      next_Population[next_Population_Available_Index] = current_Population[first_Ordering_Index];
-      next_Population[next_Population_Available_Index + 1] = current_Population[second_Ordering_Index];
-
-      // remove from current_Population
-      new_Current_Population = removeOrderings(current_Population, first_Ordering_Index, second_Ordering_Index);
-    }
-
-    return new_Current_Population;
+    temp = current_ordering[firstIndex];
+    current_ordering[firstIndex] = current_ordering[secondIndex];
+    current_ordering[secondIndex] = temp;
   }
 
-  private static int[][] removeOrderings(int[][] population_Field, int first_Ordering_Index, int second_Ordering_Index) {
-    int[][] new_Pop_Field = new int[population_Field.length - 2][population_Field[0].length];
-    int temp = 0;
-
-    // fill new_Pop_Field with population_Field but skip the two extra elements
-    for (int i=0;i<population_Field.length;i++) {
-      if(temp != first_Ordering_Index && temp != second_Ordering_Index) {
-        new_Pop_Field[temp] = population_Field[i];
-        temp++;
-      }
-    }
-    return new_Pop_Field;
-  }
-
-  private static void crossOverFunction(int[] first_Ordering, int[] second_Ordering, int cuttingPoint) {
+  // This method modifies the data at current_Population[population_Index] and current_Population[population_Index + 1]
+  // It then adds the two modified int[] to next_Population[population_Index] and next_Population[population_Index + 1]
+  private static void crossoverProcess(int[][] current_Population, int[][] next_Population, int population_Index) {
     ArrayList<Integer> first_Ordering_Duplicates = new ArrayList<Integer>();
     ArrayList<Integer> second_Ordering_Duplicates = new ArrayList<Integer>();
-    int orderingLengths = first_Ordering.length;
+    int[][] new_Current_Population = current_Population;
+    int orderingLengths = current_Population[population_Index].length;
+    int cuttingPoint;
     int temp;
     boolean duplicates = false;
 
+    Random randomGenerator = new Random();
+    cuttingPoint = randomGenerator.nextInt(current_Population[0].length - 3);
+    cuttingPoint++; // between 1 and |N| - 2
+
     // apply crossover
     for(int i=cuttingPoint;i<orderingLengths;i++) {
-      temp = first_Ordering[i];
-      first_Ordering[i] = second_Ordering[i];
-      second_Ordering[i] = temp;
+      temp = current_Population[population_Index][i];
+      current_Population[population_Index][i] = current_Population[population_Index + 1][i];
+      current_Population[population_Index + 1][i] = temp;
     }
 
     // check for duplicate Values
     for (int i=0;i<orderingLengths;i++) {
       for (int j=0;j<orderingLengths;j++) {
-        if(first_Ordering[i] == first_Ordering[j] && i != j) {
+        if(current_Population[population_Index][i] == current_Population[population_Index][j] && i != j) {
           duplicates = true;
-          first_Ordering_Duplicates.add(first_Ordering[i]);
+          first_Ordering_Duplicates.add(current_Population[population_Index][i]);
         }
-        if(second_Ordering[i] == second_Ordering[j] && i != j) {
+        if(current_Population[population_Index + 1][i] == current_Population[population_Index + 1][j] && i != j) {
           duplicates = true;
-          second_Ordering_Duplicates.add(second_Ordering[i]);
+          second_Ordering_Duplicates.add(current_Population[population_Index + 1][i]);
         }
       }
     }
@@ -239,32 +212,36 @@ public class sa extends JFrame {
       // (one that is now a duplicate in the other set)
       for (int i=0;i<first_Ordering_Duplicates.size();i++ ) {
         for (int j=0;j<orderingLengths;j++) {
-          if(first_Ordering_Duplicates.get(i) == first_Ordering[j]) {
-            first_Ordering[j] = second_Ordering_Duplicates.get(i);
+          if(first_Ordering_Duplicates.get(i) == current_Population[population_Index][j]) {
+            current_Population[population_Index][j] = second_Ordering_Duplicates.get(i);
             break;
           }
         }
         for (int j=0;j<orderingLengths;j++) {
-          if(second_Ordering_Duplicates.get(i) == second_Ordering[j]) {
-            second_Ordering[j] = first_Ordering_Duplicates.get(i);
+          if(second_Ordering_Duplicates.get(i) == current_Population[population_Index + 1][j]) {
+            current_Population[population_Index + 1][j] = first_Ordering_Duplicates.get(i);
             break;
           }
         }
       }
     }
+
+    // Add to next population
+    next_Population[population_Index] = current_Population[population_Index];
+    next_Population[population_Index + 1] = current_Population[population_Index + 1];
   }
 
   public static double getFitnessCost(int[] ordering) {
     double totalEdgeLength =0;
     double x1, y1, x2, y2;
     for (int i=0;i<v;i++) {
-      x1 = Math.cos(i*chunk);
-      y1 = Math.sin(i*chunk);
-      for (int j=0;j<v;j++) {
-        x2 = Math.cos(j*chunk);
-        y2 = Math.sin(j*chunk);
+      for (int j=i+1;j<v;j++) {
         if (adj[i][j]==1) {
-          totalEdgeLength=+Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+          x1 = (((double) Math.cos(i*chunk))*radius + mov);
+          y1 = (((double) Math.sin(i*chunk))*radius + mov);
+          x2 = (((double) Math.cos(j*chunk))*radius + mov);
+          y2 = (((double) Math.sin(j*chunk))*radius + mov);
+          totalEdgeLength+=Math.sqrt(((y2 - y1) * (y2 - y1)) + ((x2 - x1) * (x2 - x1)));
         }
       }
     }
@@ -337,18 +314,20 @@ public class sa extends JFrame {
   private static void printMatrix(int[][] matrix) {
     for(int i=0;i<matrix[0].length;i++) {
       for(int j=0;j<matrix[0].length;j++) {
-          System.out.print(matrix[i][j] + " ");
+        System.out.print(matrix[i][j] + " ");
       }
       System.out.println("");
     }
   }
 
-
   private static int[][] selectionProcess(int[][] current_Population, int P) {
-    int[][] sorted_Population = sortByFitness(current_Population, P);
+    int[][] sorted_Population = Arrays.copyOf(sortByFitness(current_Population, P), P);
 
-    //TODO: remove the bottom third of the population and replace with the top third
-
+    int third = P/3;
+    for (int i=0; i<third; i++ ) {
+      sorted_Population[P-1-i] = sorted_Population[third-i];
+    }
+    sorted_Population = Arrays.copyOf(sortByFitness(current_Population, P), P);
 
     return sorted_Population;
   }
@@ -356,20 +335,20 @@ public class sa extends JFrame {
   // sort by fitness (lowest first)
   private static int[][] sortByFitness(int[][] current_Population, int P) {
     double[] orderingValues = new double[P];
-    	for (int i=0; i<P; i++) {
-    		orderingValues[i]=getFitnessCost(current_Population[i]);
-    	}
-    	int[][] sortedPopulation = current_Population.clone();
-      double[] sortedValues = orderingValues.clone();
-    	Arrays.sort(sortedValues);
-    		for (int i=0; i<P; i++)
-    		{
-    			for (int j=0; j<P; j++) {
-    				if (orderingValues[j]==sortedValues[i]) {
-    					sortedPopulation[i]=current_Population[j];
-    				}
-    			}
-    		}
-		return sortedPopulation;
+    for (int i=0; i<P; i++) {
+      orderingValues[i]=getFitnessCost(current_Population[i]);
+    }
+    int[][] sortedPopulation = Arrays.copyOf(current_Population, P);
+    double[] sortedValues = Arrays.copyOf(orderingValues, P);
+    Arrays.sort(sortedValues);
+    for (int i=0; i<P; i++)
+    {
+      for (int j=0; j<P; j++) {
+        if (orderingValues[j]==sortedValues[i]) {
+          sortedPopulation[i]=current_Population[j];
+        }
+      }
+    }
+    return sortedPopulation;
   }
 }
