@@ -1,3 +1,15 @@
+/*  Project Group Members:
+*
+*   Eoin Gohery - 17206413
+*   Cian McInerney - 17232724
+*   Jonathan Ryley - 17244501
+*   Zeyuan Song - 19096216
+*
+*/
+
+
+
+
 import javax.swing.*;
 import java.util.*;
 import java.awt.Graphics;
