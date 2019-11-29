@@ -7,9 +7,6 @@
 *
 */
 
-
-
-
 import javax.swing.*;
 import java.util.*;
 import java.awt.Graphics;
